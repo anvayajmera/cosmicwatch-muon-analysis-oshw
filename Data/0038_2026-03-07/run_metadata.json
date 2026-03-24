@@ -1,0 +1,21 @@
+{
+  "run_number": 38,
+  "run_name": "0038_2026-03-07",
+  "run_folder": "/home/anvay/cw_data/0038_2026-03-07",
+  "start_ts_utc": "2026-03-07T21:37:33.544+00:00",
+  "boot_id": "7b983730-e309-4f13-9286-82c9298c0cfb",
+  "serial_port_arg": "/dev/ttyACM0",
+  "serial_port_realpath": "/dev/ttyACM0",
+  "baud": 115200,
+  "sensor_hz": 1.0,
+  "env_window_s": 60,
+  "sys_hz": 0.1,
+  "sea_level_hpa": 1013.25,
+  "photo_enabled": true,
+  "photo_interval_s": 3600,
+  "photo_immediate": false,
+  "camera_cmd_found": "rpicam-still",
+  "bmp_enabled": true,
+  "bno_enabled": true,
+  "python": "3.13.5 (main, Jun 25 2025, 18:55:22) [GCC 14.2.0]"
+}

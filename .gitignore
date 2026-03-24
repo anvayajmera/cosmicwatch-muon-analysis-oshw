@@ -1,0 +1,22 @@
+# Python
+__pycache__/
+*.pyc
+
+# Virtual env
+.venv/
+
+# macOS
+.DS_Store
+
+# SMB/temp artifacts
+.smbdelete*
+
+# Raw camera/media and bulky auxiliary logs not needed for paper analysis
+Data/*/photos/
+Data/*/camera.log
+Data/*/cosmicwatch_misc.log
+Data/*/run.log
+
+# Keep coincidence + env + system for analysis; skip bulky auxiliary event streams
+Data/*/cosmicwatch_master.csv
+Data/*/cosmicwatch_noncoincidence.csv

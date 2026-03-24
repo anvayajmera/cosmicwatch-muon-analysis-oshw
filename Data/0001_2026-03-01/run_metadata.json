@@ -1,0 +1,21 @@
+{
+  "run_number": 7,
+  "run_name": "0007_2026-03-01",
+  "run_folder": "/home/anvay/cw_data/0007_2026-03-01",
+  "start_ts_utc": "2026-03-01T00:09:04.517+00:00",
+  "boot_id": "7d103e3e-2bc3-4ac3-b54d-2333ae30ed14",
+  "serial_port_arg": "/dev/serial/by-id/usb-Raspberry_Pi_Pico_E66368254F2F2531-if00",
+  "serial_port_realpath": "/dev/ttyACM0",
+  "baud": 115200,
+  "sensor_hz": 1.0,
+  "env_window_s": 60,
+  "sys_hz": 0.1,
+  "sea_level_hpa": 1013.25,
+  "photo_enabled": true,
+  "photo_interval_s": 3600,
+  "photo_immediate": false,
+  "camera_cmd_found": "rpicam-still",
+  "bmp_enabled": true,
+  "bno_enabled": true,
+  "python": "3.13.5 (main, Jun 25 2025, 18:55:22) [GCC 14.2.0]"
+}
