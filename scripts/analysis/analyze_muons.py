@@ -8,9 +8,9 @@ from pathlib import Path
 import pandas as pd
 
 
-BASE_DIR = Path(__file__).resolve().parent
-OUT_FILE = BASE_DIR / "clean_muon_dataset.csv"
-FIGURES_DIR = BASE_DIR / "figures"
+ROOT_DIR = Path(__file__).resolve().parents[2]
+OUT_FILE = ROOT_DIR / "clean_muon_dataset.csv"
+FIGURES_DIR = ROOT_DIR / "figures"
 REPORT_FILE = FIGURES_DIR / "session_ingest_report.csv"
 
 RESAMPLE_WINDOW = "10min"
@@ -33,7 +33,6 @@ class SessionPaths:
 
 
 def parse_utc_mixed(series: pd.Series) -> pd.Series:
-    # Handles mixed timestamp formats such as second-resolution and sub-second rows.
     return pd.to_datetime(series, utc=True, errors="coerce", format="mixed")
 
 
@@ -79,7 +78,6 @@ def discover_session_paths(base_dir: Path) -> list[SessionPaths]:
         except FileNotFoundError as exc:
             print(f"Skipping {directory.name}: {exc}")
 
-    # Legacy fallback support: session N folders with prefixed csv names.
     if not out:
         for directory in sorted(base_dir.glob("session *")):
             if not directory.is_dir():
@@ -123,7 +121,7 @@ def discover_session_paths(base_dir: Path) -> list[SessionPaths]:
             except FileNotFoundError as exc:
                 print(f"Skipping {directory.name}: {exc}")
 
-    out.sort(key=lambda x: x.session)
+    out.sort(key=lambda x: (x.run_date or "", x.directory.name))
     return out
 
 
@@ -173,7 +171,6 @@ def count_csv_rows(path: Path | None) -> int | None:
         return None
 
     with path.open("r", encoding="utf-8", errors="ignore") as f:
-        # Subtract one for header row; clamp at zero for empty files.
         return max(sum(1 for _ in f) - 1, 0)
 
 
@@ -302,7 +299,7 @@ def main() -> None:
     print("Starting analysis...")
     args = parse_args()
 
-    sessions = discover_session_paths(BASE_DIR)
+    sessions = discover_session_paths(ROOT_DIR)
     if args.sessions is not None:
         requested = set(args.sessions)
         sessions = [s for s in sessions if s.session in requested]

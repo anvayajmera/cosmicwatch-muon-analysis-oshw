@@ -1,7 +1,7 @@
 {
-  "run_number": 7,
-  "run_name": "0007_2026-03-01",
-  "run_folder": "/home/anvay/cw_data/0007_2026-03-01",
+  "run_number": 1,
+  "run_name": "0001_2026-03-01",
+  "run_folder": "/home/anvay/cw_data/0001_2026-03-01",
   "start_ts_utc": "2026-03-01T00:09:04.517+00:00",
   "boot_id": "7d103e3e-2bc3-4ac3-b54d-2333ae30ed14",
   "serial_port_arg": "/dev/serial/by-id/usb-Raspberry_Pi_Pico_E66368254F2F2531-if00",

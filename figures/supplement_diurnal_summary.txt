@@ -1,0 +1,19 @@
+Supplemental Diurnal Check
+==========================
+Runs: Run 1 (2026-03-01), Run 2 (2026-03-07), Run 3 (2026-03-11), Run 4 (2026-03-19), Run 5 (2026-03-20), Run 6 (2026-03-22)
+Run IDs: 1, 2, 3, 4, 5, 6
+UTC span: 2026-03-01 00:10:00+00:00 to 2026-03-23 23:20:00+00:00
+N bins: 2259
+
+Global atmospheric correction:
+  beta = 0.1294 %/hPa
+  p(beta) = 4.45e-08
+  p(temp) = 0.762
+
+Global 24h harmonic after correction:
+  amplitude = 0.5194 %
+  joint p(sin24, cos24) = 0.114
+
+Production note:
+  Detailed day-by-day, spectral, heatmap, and cumulative diurnal diagnostics were removed.
+  The kept supplement is limited to a run-by-run raw/corrected folded view plus the hourly summary table.

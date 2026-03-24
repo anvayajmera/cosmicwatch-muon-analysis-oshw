@@ -2,7 +2,7 @@ Muon Atmospheric and Diurnal Analysis Summary
 ===========================================
 N bins (10-minute): 2259
 Runs included: Run 1 (2026-03-01), Run 2 (2026-03-07), Run 3 (2026-03-11), Run 4 (2026-03-19), Run 5 (2026-03-20), Run 6 (2026-03-22)
-Session IDs included: 1, 38, 39, 40, 41, 42
+Run IDs included: 1, 2, 3, 4, 5, 6
 UTC span: 2026-03-01 00:10:00+00:00 to 2026-03-23 23:20:00+00:00
 Mean rate: 13.8532 counts/min
 Pressure range: 987.41 to 1037.98 hPa

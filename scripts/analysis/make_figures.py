@@ -11,21 +11,15 @@ from scipy import stats
 from scipy.stats import poisson
 from statsmodels.stats.diagnostic import acorr_ljungbox
 
-
-# ---------------------------
-# CONFIG
-# ---------------------------
-DATA_FILE = Path("clean_muon_dataset.csv")
-OUT_DIR = Path("figures")
+ROOT_DIR = Path(__file__).resolve().parents[2]
+DATA_FILE = ROOT_DIR / "clean_muon_dataset.csv"
+OUT_DIR = ROOT_DIR / "figures"
 LOCAL_TZ = ZoneInfo("America/New_York")
 HAC_MAXLAGS = 6
 BIN_MINUTES = 10.0
-ROLLING_BINS = 18  # 3-hour rolling window for trend visualization
+ROLLING_BINS = 18
 
 
-# ---------------------------
-# HELPERS
-# ---------------------------
 def reset_output_dir(out_dir: Path, keep_names: set[str] | None = None) -> None:
     keep = keep_names or set()
     out_dir.mkdir(exist_ok=True)
@@ -93,7 +87,6 @@ def load_dataset(path: Path) -> pd.DataFrame:
     df["sin24"] = np.sin(omega * local_hour_float)
     df["cos24"] = np.cos(omega * local_hour_float)
 
-    # Optional stability channels
     if {"euler_roll_deg_mean", "euler_pitch_deg_mean"}.issubset(df.columns):
         df["tilt_deg"] = np.sqrt(df["euler_roll_deg_mean"] ** 2 + df["euler_pitch_deg_mean"] ** 2)
     if {"linacc_x_mps2_mean", "linacc_y_mps2_mean", "linacc_z_mps2_mean"}.issubset(df.columns):
@@ -146,7 +139,6 @@ def fit_models(df: pd.DataFrame) -> dict[str, sm.regression.linear_model.Regress
         cov_type="HAC", cov_kwds={"maxlags": HAC_MAXLAGS}
     )
 
-    # Poisson model used as a robustness check for count data.
     models["poisson_diurnal"] = sm.GLM(
         df["muon_counts"],
         x_diurnal,
@@ -273,13 +265,11 @@ def make_figures(df: pd.DataFrame, models: dict[str, object]) -> dict[str, float
     beta = -float(m_atm.params["dP"])
     beta_pct = 100.0 * beta
 
-    # Pressure-corrected and pressure+temperature corrected rates.
     df["rate_pressure_corr"] = df["rate_cpm"] * np.exp(beta * df["dP"])
     df["rate_atm_corr"] = df["rate_cpm"] * np.exp(
         -(float(m_atm.params["dP"]) * df["dP"] + float(m_atm.params["dT"]) * df["dT"])
     )
 
-    # Diurnal metrics from harmonic coefficients in log space.
     a_sin = float(m_diurnal.params["sin24"])
     b_cos = float(m_diurnal.params["cos24"])
     amp_frac = float(np.sqrt(a_sin**2 + b_cos**2))
@@ -292,7 +282,6 @@ def make_figures(df: pd.DataFrame, models: dict[str, object]) -> dict[str, float
     poisson_floor_pct = float(100.0 / np.sqrt(mean_counts))
     amp_vs_floor = float(amp_pct / poisson_floor_pct)
 
-    # Figure 1: count rate vs pressure
     plt.figure(figsize=(8, 5))
     for session in sorted(df["session"].unique()):
         sub = df[df["session"] == session]
@@ -310,7 +299,6 @@ def make_figures(df: pd.DataFrame, models: dict[str, object]) -> dict[str, float
     plt.savefig(OUT_DIR / "figure1_rate_vs_pressure.png", dpi=300)
     plt.close()
 
-    # Figure 2: raw rate vs time (raw points + rolling trend)
     plt.figure(figsize=(11, 5))
     for session in sorted(df["session"].unique()):
         sub = df[df["session"] == session]
@@ -325,7 +313,6 @@ def make_figures(df: pd.DataFrame, models: dict[str, object]) -> dict[str, float
     plt.savefig(OUT_DIR / "figure2_rate_vs_time.png", dpi=300)
     plt.close()
 
-    # Figure 3: raw vs corrected anomaly (%) to make correction effect interpretable
     plt.figure(figsize=(11, 5))
     for session in sorted(df["session"].unique()):
         sub = df[df["session"] == session]
@@ -351,7 +338,6 @@ def make_figures(df: pd.DataFrame, models: dict[str, object]) -> dict[str, float
     plt.savefig(OUT_DIR / "figure3_corrected_rate_vs_time.png", dpi=300)
     plt.close()
 
-    # Figure 4: histogram with Poisson overlay
     counts = df["muon_counts"].round().astype(int).values
     lam = counts.mean()
     xk = np.arange(counts.min(), counts.max() + 1)
@@ -373,7 +359,6 @@ def make_figures(df: pd.DataFrame, models: dict[str, object]) -> dict[str, float
     plt.savefig(OUT_DIR / "figure4_poisson_histogram.png", dpi=300)
     plt.close()
 
-    # Figure 5: diurnal fold on atmosphere-corrected rate
     hourly = (
         df.groupby("local_hour")["rate_atm_corr"]
         .agg(mean_rate="mean", std_rate="std", n="size")
@@ -408,7 +393,6 @@ def make_figures(df: pd.DataFrame, models: dict[str, object]) -> dict[str, float
     plt.savefig(OUT_DIR / "figure5_diurnal_folded.png", dpi=300)
     plt.close()
 
-    # Optional appendix stability figures
     if "tilt_deg" in df.columns and df["tilt_deg"].notna().sum() > 30:
         sub = df[["tilt_deg"]].dropna()
         plt.figure(figsize=(11, 4.5))
@@ -465,7 +449,12 @@ def make_figures(df: pd.DataFrame, models: dict[str, object]) -> dict[str, float
 
 
 def main() -> None:
-    keep_files = {"session_ingest_report.csv"}
+    keep_files = {
+        "session_ingest_report.csv",
+        "supplement_diurnal_by_run.png",
+        "supplement_diurnal_hourly_stats.csv",
+        "supplement_diurnal_summary.txt",
+    }
     reset_output_dir(OUT_DIR, keep_names=keep_files)
 
     df = load_dataset(DATA_FILE)
@@ -512,7 +501,8 @@ def main() -> None:
         f.write("===========================================\n")
         f.write(f"N bins (10-minute): {len(df)}\n")
         f.write(f"Runs included: {', '.join(run_labels)}\n")
-        f.write(f"Session IDs included: {', '.join(str(int(x)) for x in sorted(df['session'].unique()))}\n")
+        run_ids = sorted(int(x) for x in df["run_number"].dropna().unique())
+        f.write(f"Run IDs included: {', '.join(str(x) for x in run_ids)}\n")
         f.write(f"UTC span: {df.index.min()} to {df.index.max()}\n")
         f.write(f"Mean rate: {df['rate_cpm'].mean():.4f} counts/min\n")
         f.write(

@@ -15,14 +15,13 @@ from datetime import datetime, timezone
 
 import serial
 
-# I2C sensor libs (optional if disabled / missing)
 import board
 import busio
 import adafruit_bmp280
 import adafruit_bno055
 
 try:
-    import fcntl  # Linux-only, present on Raspberry Pi OS
+    import fcntl
 except Exception:
     fcntl = None
 
@@ -30,9 +29,6 @@ except Exception:
 STOP = False
 
 
-# -----------------------------
-# Basic utilities
-# -----------------------------
 def iso_utc_now() -> str:
     return datetime.now(timezone.utc).isoformat(timespec="milliseconds")
 
@@ -121,18 +117,11 @@ def handle_sig(*_):
     STOP = True
 
 
-# -----------------------------
-# Locking (prevents double-run)
-# -----------------------------
 def acquire_lock(lock_path: str, log_f=None):
-    """
-    Creates/opens lock file and grabs an exclusive lock.
-    If another instance holds it, exit immediately.
-    """
     mkdirp(os.path.dirname(lock_path) or ".")
     f = open(lock_path, "w", encoding="utf-8")
     if fcntl is None:
-        # Fallback: best-effort only
+        # best effort
         try:
             f.write(str(os.getpid()))
             f.flush()
@@ -159,9 +148,6 @@ def acquire_lock(lock_path: str, log_f=None):
     return f
 
 
-# -----------------------------
-# Run folder management
-# -----------------------------
 def next_run_folder(base_outdir: str):
     mkdirp(base_outdir)
     counter_path = os.path.join(base_outdir, "run_counter.txt")
@@ -181,9 +167,6 @@ def next_run_folder(base_outdir: str):
     return n, run_folder, folder_name
 
 
-# -----------------------------
-# Camera (optional)
-# -----------------------------
 def camera_command():
     for c in ["rpicam-still", "libcamera-still"]:
         if shutil.which(c):
@@ -244,9 +227,6 @@ def photo_loop(run_folder, interval_s, do_immediate, cam_log_f):
         fsync_file(cam_log_f)
 
 
-# -----------------------------
-# System metrics thread
-# -----------------------------
 def sys_loop(sys_f, hz):
     period = 1.0 / hz
     next_t = time.time()
@@ -269,9 +249,6 @@ def sys_loop(sys_f, hz):
             sys_f.write(f"{ts},ERROR,{repr(e)}\n")
 
 
-# -----------------------------
-# NaN-safe stats helpers
-# -----------------------------
 def to_float_or_nan(x):
     if x is None:
         return float("nan")
@@ -310,7 +287,7 @@ def mode_int(vals):
     counts = {}
     for iv in clean:
         counts[iv] = counts.get(iv, 0) + 1
-    # highest count, then smallest value
+    # tiebreak low
     return str(sorted(counts.items(), key=lambda kv: (-kv[1], kv[0]))[0][0])
 
 
@@ -323,9 +300,6 @@ def clamp_or_nan(x, lo, hi):
     return fx
 
 
-# -----------------------------
-# Environment aggregation thread
-# -----------------------------
 def env_aggregate_loop(env_f, bmp, bno, sample_hz, window_s, sea_level_hpa, include_bno: bool, run_log=None):
     period = 1.0 / sample_hz
     next_t = time.time()
@@ -407,7 +381,6 @@ def env_aggregate_loop(env_f, bmp, bno, sample_hz, window_s, sea_level_hpa, incl
                     grx, gry, grz = f3(gyro)
                     mx, my, mz = f3(mag)
 
-                    # push
                     b["euler_heading_deg_mean"].append(eh)
                     b["euler_roll_deg_mean"].append(er)
                     b["euler_pitch_deg_mean"].append(ep)
@@ -467,7 +440,6 @@ def env_aggregate_loop(env_f, bmp, bno, sample_hz, window_s, sea_level_hpa, incl
 
                 env_f.write(",".join(row) + "\n")
 
-                # reset window
                 win_start = iso_utc_now()
                 win_start_t = time.time()
                 bmp_temp.clear()
@@ -487,14 +459,7 @@ def env_aggregate_loop(env_f, bmp, bno, sample_hz, window_s, sea_level_hpa, incl
             time.sleep(1)
 
 
-# -----------------------------
-# CosmicWatch parsing + serial robustness
-# -----------------------------
 def parse_cw_line(line: str):
-    """
-    Returns tuple(event, runtime_s, flag, adc, sipm_mv, dead_s, name) or None
-    Rejects corrupt lines via sanity checks.
-    """
     parts = line.split("\t")
     if len(parts) < 6:
         return None
@@ -510,15 +475,12 @@ def parse_cw_line(line: str):
     except Exception:
         return None
 
-    # Sanity checks
     if event < 0 or runtime_s < 0 or dead_s < 0:
         return None
     if flag not in (0, 1):
         return None
-    # v3X is 12-bit ADC
     if not (0 <= adc <= 4095):
         return None
-    # SiPM mV should be non-negative; cap to reject obvious corruption
     if not (0.0 <= sipm_mv <= 6000.0):
         return None
 
@@ -526,23 +488,16 @@ def parse_cw_line(line: str):
 
 
 def open_serial(port: str, baud: int):
-    """
-    Non-blocking serial. exclusive=True prevents another process from opening same port.
-    """
     return serial.Serial(
         port,
         baud,
-        timeout=0,          # non-blocking
+        timeout=0,
         write_timeout=1,
         exclusive=True,
     )
 
 
 def serial_reader_loop(ser, run_log, on_line):
-    """
-    Reads bytes, assembles full lines, calls on_line(str_line, ts_utc).
-    Handles Linux CDC empty-read quirk without treating as disconnect.
-    """
     buf = b""
     last_rx = time.time()
 
@@ -554,7 +509,6 @@ def serial_reader_loop(ser, run_log, on_line):
                 last_rx = time.time()
                 buf += chunk
 
-                # Process complete lines
                 while b"\n" in buf:
                     raw_line, buf = buf.split(b"\n", 1)
                     raw_line = raw_line.rstrip(b"\r")
@@ -565,28 +519,21 @@ def serial_reader_loop(ser, run_log, on_line):
                     on_line(s, ts)
 
             else:
-                # No bytes available
                 time.sleep(0.01)
 
         except serial.SerialException as e:
-            # Real port error: log + rethrow so main can reopen
             run_log.write(f"{iso_utc_now()} SERIAL_EXCEPTION {repr(e)}\n")
             fsync_file(run_log)
             raise
         except Exception as e:
-            # Non-fatal: keep going
             run_log.write(f"{iso_utc_now()} SERIAL_READ_ERROR {repr(e)}\n")
             fsync_file(run_log)
             time.sleep(0.05)
 
-        # Optional: if nothing received for a long time, just idle (not an error)
         if (time.time() - last_rx) > 60:
             last_rx = time.time()
 
 
-# -----------------------------
-# Main
-# -----------------------------
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--port", required=True, help="Use /dev/serial/by-id/... (recommended) or /dev/ttyACM0")
@@ -615,7 +562,6 @@ def main():
 
     run_n, run_folder, run_name = next_run_folder(os.path.expanduser(args.outdir))
 
-    # Files
     cw_master_path = os.path.join(run_folder, "cosmicwatch_master.csv")
     cw_coin_path = os.path.join(run_folder, "cosmicwatch_coincidence.csv")
     cw_noncoin_path = os.path.join(run_folder, "cosmicwatch_noncoincidence.csv")
@@ -633,14 +579,12 @@ def main():
     sys_f = open_linebuffered(sys_path)
     cam_log_f = open_linebuffered(cam_log_path)
 
-    # Lock (prevents double-run)
     lock_path = os.path.join(os.path.expanduser(args.outdir), ".cw_logger.lock")
     lock_f = acquire_lock(lock_path, log_f=run_log)
 
     run_log.write(f"{iso_utc_now()} run={run_name} boot_id={read_boot_id()} starting\n")
     run_log.write(f"{iso_utc_now()} port={args.port} baud={args.baud}\n")
 
-    # NTP sync
     synced = wait_for_ntp_sync(args.wait_time_sync_s)
     run_log.write(f"{iso_utc_now()} ntp_synced={synced}\n")
     if not synced and not args.allow_unsynced:
@@ -649,14 +593,12 @@ def main():
         print("[ERROR] NTP not synced. Use --allow-unsynced if you absolutely must run anyway.")
         sys.exit(2)
 
-    # Wait for device node
     if not wait_for_path(args.port, args.wait_device_s):
         run_log.write(f"{iso_utc_now()} ERROR serial_port_not_found={args.port}\n")
         fsync_file(run_log)
         print(f"[ERROR] Serial port not found: {args.port}")
         sys.exit(3)
 
-    # I2C init
     i2c = None
     if not args.no_bmp or not args.no_bno:
         try:
@@ -667,7 +609,7 @@ def main():
 
     bmp = None
     if (not args.no_bmp) and i2c is not None:
-        # probe 0x76 then 0x77
+        # try 0x76 then 0x77
         for addr in (0x76, 0x77):
             try:
                 bmp = adafruit_bmp280.Adafruit_BMP280_I2C(i2c, address=addr)
@@ -681,7 +623,7 @@ def main():
     bno = None
     include_bno = (not args.no_bno) and (i2c is not None)
     if include_bno:
-        # common BNO addresses are 0x28 and 0x29
+        # try 0x28 then 0x29
         for addr in (0x28, 0x29):
             try:
                 bno = adafruit_bno055.BNO055_I2C(i2c, address=addr)
@@ -693,7 +635,6 @@ def main():
             include_bno = False
             run_log.write(f"{iso_utc_now()} WARN bno055_not_found\n")
 
-    # Metadata
     meta = {
         "run_number": run_n,
         "run_name": run_name,
@@ -717,7 +658,6 @@ def main():
     }
     safe_write_text(meta_path, json.dumps(meta, indent=2) + "\n")
 
-    # Start threads
     th_env = threading.Thread(
         target=env_aggregate_loop,
         args=(env_f, bmp, bno, args.sensor_hz, args.env_window_s, args.sea_level_hpa, include_bno, run_log),
@@ -736,7 +676,6 @@ def main():
         )
         th_photo.start()
 
-    # CSV writers
     def open_cw_csv(path):
         f = open_linebuffered(path)
         w = csv.writer(f)
@@ -760,7 +699,6 @@ def main():
     cw_coin_f, cw_coin_w = open_cw_csv(cw_coin_path)
     cw_noncoin_f, cw_noncoin_w = open_cw_csv(cw_noncoin_path)
 
-    # Serial open
     ser = None
     while not STOP:
         try:
@@ -793,7 +731,7 @@ def main():
 
         parsed = parse_cw_line(s)
         if parsed is None:
-            # keep raw line for audit/debug
+            # keep raw line
             cw_misc_f.write(f"{ts}\t{s}\n")
             return
 
@@ -811,18 +749,17 @@ def main():
             kind = "COIN" if flag == 1 else "SING"
             print(f"[{ts[11:23]}] n={lines} last_event={event} {kind} adc={adc} sipm={sipm_mv:.3f}mV")
 
-        # periodic flush
+        # flush
         if (time.time() - last_flush) > 10:
             for f in (cw_master_f, cw_coin_f, cw_noncoin_f, cw_misc_f, run_log, env_f, sys_f, cam_log_f):
                 fsync_file(f)
             last_flush = time.time()
 
-    # Main serial loop with reopen on real errors
     while not STOP:
         try:
             serial_reader_loop(ser, run_log, on_line)
         except serial.SerialException:
-            # real error: try reopen
+            # try reopen
             try:
                 ser.close()
             except Exception:
@@ -842,7 +779,6 @@ def main():
                 fsync_file(run_log)
                 time.sleep(2)
 
-    # Shutdown
     run_log.write(f"{iso_utc_now()} stopping\n")
     for f in (cw_master_f, cw_coin_f, cw_noncoin_f, cw_misc_f, run_log, env_f, sys_f, cam_log_f):
         fsync_file(f)
@@ -865,5 +801,3 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, handle_sig)
     signal.signal(signal.SIGTERM, handle_sig)
     main()
-
-

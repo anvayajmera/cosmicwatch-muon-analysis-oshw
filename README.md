@@ -1,46 +1,57 @@
 # Orionis2 Muon Analysis Repo
 
-This repository contains end-to-end analysis for a CosmicWatch v3X coincidence muon dataset (events + environmental + system telemetry), prepared for AP Research writing.
+This repository contains the production-ready analysis package for the CosmicWatch v3X coincidence muon dataset used in the paper draft.
 
-## Current Analysis Status
-- Full-data ingest complete across 6 runs.
-- All core and appendix figures regenerated.
-- Atmospheric and diurnal model outputs regenerated.
-- Run labels standardized (`Run N (YYYY-MM-DD)`) across exported tables.
+## Current Status
+- Raw run folders normalized to sequential paper order: `0001_2026-03-01` through `0006_2026-03-22`
+- Core paper figures and regression tables available in `figures/`
+- Diurnal exports reduced to a compact supplement instead of a seven-figure diagnostic pack
 
 ## Main Result Snapshot
-- Pressure effect: significant inverse relationship.
+- Pressure effect: significant inverse relationship
   - `beta = 0.1294 %/hPa`, `p = 4.45e-08`
-- Temperature term: not significant in multivariable model.
+- Temperature term: not significant in the multivariable model
   - `p = 0.762`
-- Diurnal 24h harmonic after atmospheric correction: not significant at `alpha = 0.05`.
+- Diurnal 24-hour harmonic after atmospheric correction: suggestive but not significant
   - joint `p = 0.114`
   - amplitude `0.5194%` of mean
 
 ## Repo Layout
-- `Data/`: raw per-run folders from the Raspberry Pi logger
-- `analyze_muons.py`: builds merged clean 10-minute dataset
-- `make_figures.py`: core figures + model tables + paper summary text
-- `make_diurnal_figures.py`: extended diurnal figure pack + diagnostics
-- `clean_muon_dataset.csv`: merged analysis-ready dataset
-- `figures/`: generated figures, CSV tables, and summary text files
-- `CLAUDE_PACKET.md`: up-to-date writing packet for paper drafting
-- `graphbreakdown.md`: plain-language explanation of each graph
-- `FIGURE_CAPTIONS.md`: manuscript-ready caption drafts
-
-## Reproduce All Outputs
-Run from repo root:
-
-```bash
-python3 analyze_muons.py --all-sessions
-python3 make_figures.py
-python3 make_diurnal_figures.py --all-sessions
+```text
+cosmicwatch-muon-analysis-oshw/
+├── Data/
+├── figures/
+├── scripts/
+│   ├── acquisition/
+│   │   └── maindetectorcode.py
+│   └── analysis/
+│       ├── analyze_muons.py
+│       ├── make_figures.py
+│       └── make_diurnal_figures.py
+├── clean_muon_dataset.csv
+├── graphbreakdown.md
+└── README.md
 ```
 
-## Most Important Files for Paper Writing
-- `CLAUDE_PACKET.md`
-- `figures/paper_analysis_summary.txt`
-- `figures/diurnal_full_summary.txt`
-- `graphbreakdown.md`
-- `FIGURE_CAPTIONS.md`
+- `scripts/analysis/analyze_muons.py`: builds the merged 10-minute dataset from all runs
+- `scripts/analysis/make_figures.py`: generates the core paper figures, regression tables, and paper summary
+- `scripts/analysis/make_diurnal_figures.py`: generates the compact supplemental diurnal check
+- `scripts/acquisition/maindetectorcode.py`: Raspberry Pi logger / acquisition script
+- `Data/`: normalized per-run raw folders in paper order
+- `figures/`: exported figures, CSV tables, and summary text files
 
+## Reproduce Outputs
+Run from the repo root:
+
+```bash
+python3 scripts/analysis/analyze_muons.py --all-sessions
+python3 scripts/analysis/make_figures.py
+python3 scripts/analysis/make_diurnal_figures.py --all-sessions
+```
+
+## Most Useful Files For Writing
+- `figures/paper_analysis_summary.txt`
+- `figures/supplement_diurnal_summary.txt`
+- `figures/session_summary.csv`
+- `figures/supplement_diurnal_hourly_stats.csv`
+- `graphbreakdown.md`
