@@ -1,0 +1,8 @@
+Station Validation Summary (KSMQ vs Onboard BMP280)
+===================================================
+N aligned bins: 3415
+UTC span: 2026-03-01 00:10:00+00:00 to 2026-04-01 00:00:00+00:00
+Pressure MAD (BMP - station): 0.658 hPa
+Temperature MAD (BMP - station): 18.825 C
+Pressure correlation: 0.9997
+Temperature correlation: 0.7159

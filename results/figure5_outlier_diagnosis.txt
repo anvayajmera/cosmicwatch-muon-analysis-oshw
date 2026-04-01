@@ -1,0 +1,12 @@
+Figure 5 Outlier Diagnosis
+==========================
+Worst hourly point (by |resid/SEM|): hour 19
+N at this hour: 151 bins
+Mean corrected rate: 14.055660 cpm
+Fit at this hour: 13.860933 cpm
+Residual: 0.194728 cpm
+SEM: 0.097729 cpm
+Residual/SEM: 1.993
+
+Interpretation: this is a moderate ~2 SEM deviation, not an instrument-failure outlier.
+Because there are 24 hourly points, seeing one point near ~2 SEM is expected occasionally.

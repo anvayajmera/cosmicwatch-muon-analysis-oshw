@@ -1,82 +1,48 @@
-# Graph Breakdown (Production Figure Set)
+# Graph Breakdown (Simple Final Version)
 
-Dataset used in this package:
-- Runs: 1, 2, 3, 4, 5, 6
-- 10-minute bins: 2259
-- UTC span: 2026-03-01 00:10 to 2026-03-23 23:20
-- Mean muon rate: 13.853 counts/min
+Dataset used:
+- 3,415 bins (10-minute)
+- UTC span: 2026-03-01 00:10 to 2026-04-01 00:00
+- Sessions: 1, 38, 39, 40, 41, 42
 
-Key model results used below:
-- Barometric coefficient beta = 0.1294 %/hPa (p = 4.45e-08, significant)
-- Temperature term p = 0.762 (not significant)
-- Diurnal joint test p = 0.114 (not significant at alpha = 0.05)
-- Fitted 24h amplitude = 0.5194% of mean rate (0.0719 counts/min)
+Key results:
+- Pressure beta = 0.1181 %/hPa (p = 1.75e-10)
+- Diurnal joint p = 0.0112
+- 24-hour amplitude = 0.6288%
+- Outdoor-temperature multivariable p = 0.3683 (not significant)
+- First diurnal p < 0.05 crossing: 2026-03-29 04:10 EDT (28.33 days, n = 3,032 bins)
 
-## Main Paper Figures
+## Final Figures to Use
 
-### 1) `figures/figure1_rate_vs_pressure.png`
-What it shows: muon count rate versus atmospheric pressure, with a fitted log-linear trend.
-What it means: as pressure increases, muon rate tends to decrease. This is the clearest environmental result in the dataset.
-Paper-use line: pressure is the strongest environmental predictor, with beta = 0.1294 %/hPa.
+### Figure 1: `figures/figure1_rate_vs_pressure.png`
+Shows the inverse pressure-rate relationship.
+Use this to support the barometric effect claim.
 
-### 2) `figures/figure2_rate_vs_time.png`
-What it shows: raw 10-minute count rates over time for each run, plus a 3-hour moving average.
-What it means: the raw series contains drift and run-to-run offsets, so visual daily patterns should not be interpreted without correction.
-Paper-use line: time structure is present, but it mixes atmospheric forcing with any possible cosmic signal.
+### Figure 2: `figures/figure2_rate_vs_time.png`
+Shows raw rate over time.
+Use this to show why correction is needed.
 
-### 3) `figures/figure3_corrected_rate_vs_time.png`
-What it shows: session-wise raw anomaly versus atmosphere-corrected anomaly, both smoothed over 3 hours.
-What it means: atmospheric correction removes part of the slow drift and makes any residual periodic structure easier to inspect.
-Paper-use line: normalization is necessary before testing for subtle diurnal modulation.
+### Figure 3: `figures/figure3_corrected_rate_vs_time.png`
+Shows raw vs corrected anomaly trends.
+Use this to show the impact of atmospheric correction.
 
-### 4) `figures/figure4_poisson_histogram.png`
-What it shows: distribution of counts per 10-minute bin compared with a Poisson expectation.
-What it means: counting noise is a major limitation at this count rate.
-Paper-use line: statistical uncertainty remains large relative to a sub-percent diurnal signal.
+### Figure 4: `figures/figure4_poisson_histogram.png`
+Shows counting-statistics behavior.
+Use this to discuss uncertainty limits.
 
-### 5) `figures/figure5_diurnal_folded.png`
-What it shows: atmosphere-corrected rate folded by local hour with SEM bars and a fitted 24-hour harmonic.
-What it means: the shape is visually plausible, but the error bars remain comparable to or larger than the fitted amplitude.
-Paper-use line: the fitted 24h signal (0.5194%) is not statistically significant (p = 0.114).
+### Figure 5: `figures/figure5_diurnal_folded.png`
+Shows corrected local-hour fold and harmonic fit.
+Use this for the detected 24-hour residual result.
 
-## Supplemental Diurnal Material
+### Figure 6: `figures/figure6_outdoor_temperature_effect.png`
+Shows corrected anomaly vs outdoor temperature.
+Use this to support the non-significant temperature result.
 
-### 6) `figures/supplement_diurnal_by_run.png`
-What it shows: run-by-run hourly folds shown as paired raw and atmosphere-corrected views.
-What it means: this keeps the useful consistency check without carrying the full diagnostic pack into production.
-Paper-use line: the folded pattern is not fully stable across independent runs, which is consistent with a low signal-to-noise regime.
+### Figure 7: `figures/figure_summary_one_graph.png`
+One compact overview of the full analysis.
+Use this when you need one image for quick review/sharing.
 
-### 7) `figures/supplement_diurnal_hourly_stats.csv`
-What it contains: hourly corrected means, SEM values, and counts for each run.
-What it means: this is the compact numerical companion to the supplemental diurnal figure.
-Paper-use line: use this table only if the paper or appendix needs exact hourly values by run.
+## Progression File (Important)
+- `results/diurnal_progression_report.md`
 
-## Appendix Stability Figures
-
-### 8) `figures/appendix_tilt_vs_time.png`
-What it shows: detector tilt over time.
-What it means: checks whether mechanical orientation drift could bias rate.
-Paper-use line: use this as a detector-stability control figure.
-
-### 9) `figures/appendix_rate_vs_tilt.png`
-What it shows: count rate versus tilt.
-What it means: tests whether orientation changes could create a geometric systematic.
-Paper-use line: only a weak tilt-rate relation is visible, so tilt does not dominate the result.
-
-### 10) `figures/appendix_linacc_vs_time.png`
-What it shows: linear acceleration magnitude over time.
-What it means: checks for motion or vibration artifacts.
-Paper-use line: supports the detector-stability discussion.
-
-### 11) `figures/appendix_mag_vs_time.png`
-What it shows: magnetic field magnitude over time.
-What it means: tracks magnetic-environment changes as a secondary control channel.
-Paper-use line: useful as a supporting control variable, not a primary driver.
-
-## Big Picture For The Paper
-
-Short version:
-- Pressure has a clear, statistically significant inverse relationship with muon rate.
-- Temperature is not a significant predictor in this dataset.
-- After atmospheric correction, the 24-hour pattern is suggestive but not statistically resolved.
-- The production figure set now emphasizes the barometric result and keeps only one concise diurnal support figure.
+It tells exactly when diurnal significance first crossed p < 0.05.

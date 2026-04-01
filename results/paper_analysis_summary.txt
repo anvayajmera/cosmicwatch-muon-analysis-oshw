@@ -1,0 +1,31 @@
+Muon Atmospheric and Diurnal Analysis Summary
+===========================================
+N bins (10-minute): 3415
+Runs included: Run 1 (2026-03-01), Run 2 (2026-03-07), Run 3 (2026-03-11), Run 4 (2026-03-19), Run 5 (2026-03-20), Run 6 (2026-03-22)
+Session IDs included: 1, 38, 39, 40, 41, 42
+UTC span: 2026-03-01 00:10:00+00:00 to 2026-04-01 00:00:00+00:00
+Mean rate: 13.7757 counts/min
+Pressure range: 987.41 to 1037.98 hPa
+Temperature range: 21.67 to 29.96 C
+
+Primary atmospheric result:
+  Barometric coefficient beta = 0.1181 %/hPa (95% CI 0.0818 to 0.1544, p=1.75e-10).
+  Temperature coefficient p-value = 0.499 (not significant if p>0.05).
+  Atmospheric model R^2 = 0.0300.
+
+Diurnal result after atmospheric correction:
+  Joint test p-value for 24h harmonic = 0.0112.
+  Harmonic amplitude = 0.0866 counts/min (0.6288 % of mean).
+  Peak phase (local time) = 19.33 h.
+  Single-bin Poisson 1-sigma floor (10-min) = 8.5201 %, amplitude/floor = 0.074.
+
+  Median hourly-fold SEM = 0.7046 % (max 0.8154 %), above the fitted diurnal amplitude.
+
+Interpretation for paper:
+  Pressure is the dominant and statistically significant atmospheric predictor.
+  Temperature does not provide a statistically significant additional effect in this dataset.
+  A 24-hour diurnal signal is statistically detected after atmospheric correction.
+  The fitted amplitude remains small, so practical effect size is modest.
+
+Top raw correlation with count rate:
+  pressure_hPa: r=-0.1512, R^2=0.0229, p=6.39e-19.

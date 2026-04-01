@@ -1,0 +1,25 @@
+Literature Context Summary
+=========================
+This work beta: 0.1181 %/hPa
+This work pressure-term p-value: 1.7542e-10
+This work diurnal joint p-value: 0.0112
+This work diurnal amplitude: 0.6288 %
+
+This work N bins (10-minute): 3415
+
+Reference anchors used in comparison figure:
+- KACST detector (Adv. Space Res. 2018): beta ~ -0.067 +/- 0.008 %/hPa
+- Mexico City scintillator pair (arXiv:2403.13978): beta ~ -0.21 %/hPa
+- Applied Sciences 2021 detector: beta_TOP ~ -0.168 %/hPa
+- Matsushiro 1991 (Compton-Getting solar diurnal, E-W): amp ~ 0.030 +/- 0.007 %
+- Matsushiro 2010 (sidereal average anisotropy): amp ~ 0.034 +/- 0.003 %
+
+Ratio comparison:
+- |beta| / 0.067 (KACST 2018) = 1.76x
+- |beta| / 0.21 (Mexico City 2024) = 0.56x
+- |beta| / 0.168 (Appl. Sci. 2021) = 0.70x
+- amp / 0.030 (Matsushiro 1991 solar E-W) = 21.0x
+- amp / 0.034 (Matsushiro 2010 sidereal) = 18.5x
+
+Interpretive note:
+This detector reproduces a literature-consistent pressure response and detects a statistically significant 24-hour residual modulation. Because this is a compact non-directional setup, the 24-hour amplitude is best interpreted as residual daily modulation strength at this site/instrument configuration.

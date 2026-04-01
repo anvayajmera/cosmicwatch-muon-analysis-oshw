@@ -1,0 +1,8 @@
+Outdoor Temperature Model Summary
+=================================
+N bins: 3415
+Linear slope (% per C): -0.027137
+Linear slope p-value: 0.1686
+Multivariable model temp p-value: 0.3683
+Correlation (temp vs corrected anomaly): -0.0234
+Interpretation: no statistically significant outdoor temperature association.

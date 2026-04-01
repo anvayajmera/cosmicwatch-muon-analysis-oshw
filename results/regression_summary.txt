@@ -1,0 +1,126 @@
+PRESSURE-ONLY MODEL (log rate, session fixed effects, HAC SE)
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:               log_rate   R-squared:                       0.030
+Model:                            OLS   Adj. R-squared:                  0.028
+Method:                 Least Squares   F-statistic:                     19.42
+Date:                Tue, 31 Mar 2026   Prob (F-statistic):           2.17e-22
+Time:                        20:47:43   Log-Likelihood:                 3597.0
+No. Observations:                3415   AIC:                            -7180.
+Df Residuals:                    3408   BIC:                            -7137.
+Df Model:                           6                                         
+Covariance Type:                  HAC                                         
+==============================================================================
+                 coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+const          2.6100      0.004    586.425      0.000       2.601       2.619
+dP            -0.0011      0.000     -6.786      0.000      -0.001      -0.001
+sess_38        0.0009      0.008      0.111      0.911      -0.015       0.016
+sess_39        0.0179      0.005      3.314      0.001       0.007       0.028
+sess_40        0.0191      0.009      2.067      0.039       0.001       0.037
+sess_41        0.0164      0.007      2.432      0.015       0.003       0.030
+sess_42        0.0044      0.005      0.870      0.384      -0.005       0.014
+==============================================================================
+Omnibus:                        4.808   Durbin-Watson:                   2.057
+Prob(Omnibus):                  0.090   Jarque-Bera (JB):                4.850
+Skew:                          -0.090   Prob(JB):                       0.0885
+Kurtosis:                       2.963   Cond. No.                         90.7
+==============================================================================
+
+Notes:
+[1] Standard Errors are heteroscedasticity and autocorrelation robust (HAC) using 6 lags and without small sample correction
+
+ATMOSPHERIC MODEL (pressure + temperature, session fixed effects, HAC SE)
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:               log_rate   R-squared:                       0.030
+Model:                            OLS   Adj. R-squared:                  0.028
+Method:                 Least Squares   F-statistic:                     16.85
+Date:                Tue, 31 Mar 2026   Prob (F-statistic):           5.05e-22
+Time:                        20:47:43   Log-Likelihood:                 3597.2
+No. Observations:                3415   AIC:                            -7178.
+Df Residuals:                    3407   BIC:                            -7129.
+Df Model:                           7                                         
+Covariance Type:                  HAC                                         
+==============================================================================
+                 coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+const          2.6087      0.005    531.354      0.000       2.599       2.618
+dP            -0.0012      0.000     -6.381      0.000      -0.002      -0.001
+dT            -0.0012      0.002     -0.675      0.499      -0.005       0.002
+sess_38        0.0024      0.008      0.290      0.772      -0.014       0.019
+sess_39        0.0188      0.006      3.368      0.001       0.008       0.030
+sess_40        0.0200      0.009      2.141      0.032       0.002       0.038
+sess_41        0.0177      0.007      2.517      0.012       0.004       0.031
+sess_42        0.0063      0.006      1.072      0.284      -0.005       0.018
+==============================================================================
+Omnibus:                        4.684   Durbin-Watson:                   2.057
+Prob(Omnibus):                  0.096   Jarque-Bera (JB):                4.726
+Skew:                          -0.089   Prob(JB):                       0.0942
+Kurtosis:                       2.963   Cond. No.                         97.5
+==============================================================================
+
+Notes:
+[1] Standard Errors are heteroscedasticity and autocorrelation robust (HAC) using 6 lags and without small sample correction
+
+DIURNAL MODEL (atmospheric + sin/cos 24h, session fixed effects, HAC SE)
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:               log_rate   R-squared:                       0.033
+Model:                            OLS   Adj. R-squared:                  0.030
+Method:                 Least Squares   F-statistic:                     14.30
+Date:                Tue, 31 Mar 2026   Prob (F-statistic):           6.37e-23
+Time:                        20:47:43   Log-Likelihood:                 3601.9
+No. Observations:                3415   AIC:                            -7184.
+Df Residuals:                    3405   BIC:                            -7122.
+Df Model:                           9                                         
+Covariance Type:                  HAC                                         
+==============================================================================
+                 coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+const          2.6073      0.005    525.286      0.000       2.598       2.617
+dP            -0.0012      0.000     -6.553      0.000      -0.002      -0.001
+dT            -0.0021      0.002     -1.215      0.225      -0.005       0.001
+sin24         -0.0059      0.002     -2.884      0.004      -0.010      -0.002
+cos24          0.0021      0.002      1.078      0.281      -0.002       0.006
+sess_38        0.0040      0.008      0.485      0.628      -0.012       0.020
+sess_39        0.0201      0.006      3.564      0.000       0.009       0.031
+sess_40        0.0204      0.009      2.265      0.024       0.003       0.038
+sess_41        0.0180      0.007      2.547      0.011       0.004       0.032
+sess_42        0.0083      0.006      1.398      0.162      -0.003       0.020
+==============================================================================
+Omnibus:                        4.849   Durbin-Watson:                   2.062
+Prob(Omnibus):                  0.089   Jarque-Bera (JB):                4.885
+Skew:                          -0.091   Prob(JB):                       0.0869
+Kurtosis:                       2.970   Cond. No.                         97.8
+==============================================================================
+
+Notes:
+[1] Standard Errors are heteroscedasticity and autocorrelation robust (HAC) using 6 lags and without small sample correction
+
+POISSON ROBUSTNESS MODEL (counts, log link, HC3 SE)
+                 Generalized Linear Model Regression Results                  
+==============================================================================
+Dep. Variable:            muon_counts   No. Observations:                 3415
+Model:                            GLM   Df Residuals:                     3405
+Model Family:                 Poisson   Df Model:                            9
+Link Function:                    Log   Scale:                          1.0000
+Method:                          IRLS   Log-Likelihood:                -13206.
+Date:                Tue, 31 Mar 2026   Deviance:                       3324.0
+Time:                        20:47:43   Pearson chi2:                 3.33e+03
+No. Iterations:                     4   Pseudo R-squ. (CS):            0.03267
+Covariance Type:                  HC3                                         
+==============================================================================
+                 coef    std err          z      P>|z|      [0.025      0.975]
+------------------------------------------------------------------------------
+const          2.6107      0.005    499.543      0.000       2.600       2.621
+dP            -0.0012      0.000     -6.355      0.000      -0.002      -0.001
+dT            -0.0019      0.002     -0.988      0.323      -0.006       0.002
+sin24         -0.0059      0.002     -2.897      0.004      -0.010      -0.002
+cos24          0.0023      0.002      1.129      0.259      -0.002       0.006
+sess_38        0.0042      0.008      0.521      0.603      -0.012       0.020
+sess_39        0.0206      0.006      3.577      0.000       0.009       0.032
+sess_40        0.0210      0.009      2.268      0.023       0.003       0.039
+sess_41        0.0174      0.008      2.203      0.028       0.002       0.033
+sess_42        0.0081      0.006      1.327      0.185      -0.004       0.020
+==============================================================================

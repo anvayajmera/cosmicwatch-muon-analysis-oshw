@@ -1,0 +1,7 @@
+Figure 5 Fit Comparison
+=======================
+Current log-space harmonic amplitude: 0.628760%
+Linear harmonic amplitude: 0.627477%
+Current curve RMSE vs hourly means: 0.09486309 cpm
+Linear curve RMSE vs hourly means: 0.09483568 cpm
+Delta RMSE (linear-current): -0.00002742 cpm
