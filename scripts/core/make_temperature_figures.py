@@ -75,7 +75,8 @@ def plot_temperature_findings(
     out_dir: Path,
 ) -> dict[str, float]:
     plt.style.use("seaborn-v0_8-whitegrid")
-    fig, ax = plt.subplots(1, 1, figsize=(11.2, 7.0), dpi=280, constrained_layout=True)
+    # Make Figure 6 visually wider with moderate height for easier paper/web embedding.
+    fig, ax = plt.subplots(1, 1, figsize=(14.0, 4.8), dpi=280, constrained_layout=True)
 
     # Single, simpler panel: temperature vs pressure-corrected muon anomaly.
     x = df["smq_tempC_interp"].to_numpy()
@@ -110,7 +111,7 @@ def plot_temperature_findings(
             color="#111111",
             capsize=3,
             linewidth=1.4,
-            label="Average muon change per 2°C bin (95% CI)",
+            label="Mean +/- 95% CI",
         )
 
     lin = sm.OLS(y, sm.add_constant(x)).fit(cov_type="HC3")
@@ -120,9 +121,15 @@ def plot_temperature_findings(
     ylo = pred["mean_ci_lower"].to_numpy()
     yhi = pred["mean_ci_upper"].to_numpy()
 
-    ax.plot(xline, yline, color="#111111", linewidth=2.2, label="Linear trend")
+    ax.plot(xline, yline, color="#111111", linewidth=2.2, label="Trend fit")
     ax.fill_between(xline, ylo, yhi, color="#111111", alpha=0.12, label="Trend 95% CI")
     ax.axhline(0, color="gray", linewidth=1.0, alpha=0.85)
+
+    # Expand y-axis range slightly so point-to-point vertical separation is less visually exaggerated.
+    y_stack = np.concatenate([y[np.isfinite(y)], ylo[np.isfinite(ylo)], yhi[np.isfinite(yhi)]])
+    y_abs_max = float(np.nanmax(np.abs(y_stack))) if y_stack.size else 1.0
+    y_lim = max(4.0, 1.40 * y_abs_max)
+    ax.set_ylim(-y_lim, y_lim)
 
     lin_slope = float(lin.params[1])
     lin_p = float(lin.pvalues[1])
@@ -132,7 +139,7 @@ def plot_temperature_findings(
     annotation = (
         f"N = {len(df)} ten-minute bins\n"
         f"Slope = {lin_slope:.4f}% per °C\n"
-        f"Linear p = {lin_p:.3g}\n"
+        f"Trend p = {lin_p:.3g}\n"
         f"Model temp-term p = {p_temp:.3g}\n"
         f"Correlation = {corr:.3f}"
     )
@@ -147,7 +154,6 @@ def plot_temperature_findings(
         bbox=dict(boxstyle="round,pad=0.35", facecolor="white", edgecolor="0.8", alpha=0.95),
     )
 
-    ax.set_title("Binned Means (2°C) with 95% Confidence Intervals")
     ax.set_xlabel("Outdoor Temperature (°C), nearest station proxy")
     ax.set_ylabel("Corrected Muon Rate Change (%)")
     ax.legend(loc="upper right", fontsize=9)
